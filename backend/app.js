@@ -1,10 +1,11 @@
 const express = require('express')
-const app = express()
-app.set('view engine', 'ejs')
 
-app.get('/', (req,res) =>{
-    res.render('index', {msg: 'sjdh'})
-})
+const cors = require('cors')
+const dotenv = require('dotenv').config()
+const mongoose = require('mongoose')
+const app = express()
+
+
 
 
 

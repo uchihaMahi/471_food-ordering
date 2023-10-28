@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+const cors = cors()
 app.set("view engine", "ejs")
 
 app.use(express.urlencoded({ extended: true }))
@@ -10,6 +11,7 @@ app.get("/", (req, res) =>{
     res.render('index')
 })
 
+
 app.post("/", (req, res) =>{
     let userName = req.body.username
     let passWord = req.body.password
@@ -18,7 +20,6 @@ app.post("/", (req, res) =>{
         console.log(userMsg)
         res.render("userDash",{userMsg})
     }
-    else{
         if(userName == "rest1" && passWord == "4321"){
             let restMsg={user : userName, pass : passWord}
             console.log(restMsg)

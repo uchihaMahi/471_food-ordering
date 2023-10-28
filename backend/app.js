@@ -1,6 +1,7 @@
 
 const express = require("express")
 const app = express()
+const cors= cors()
 app.set("view engine", "ejs")
 
 app.use(express.urlencoded({ extended: true }))
@@ -37,7 +38,6 @@ app.post("/", (req, res) =>{
         }
     }
 })
-
 
 
 app.listen(5000)

@@ -1,11 +1,22 @@
-
 const express = require("express")
+const { getDb, connectToDb } = require('./dbConnect')
+
 const app = express()
-const cors= cors()
 app.set("view engine", "ejs")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
+let db
+connectToDb((err) =>{
+    if(!err){
+        app.listen(3000)
+        db = getDb()
+    }
+    else{
+        console.log("err")
+    }
+})
 
 
 app.get("/", (req, res) =>{
@@ -13,31 +24,41 @@ app.get("/", (req, res) =>{
 })
 
 app.post("/", (req, res) =>{
-    let userName = req.body.username
-    let passWord = req.body.password
-    if(userName == "user1" && passWord == "1234"){
-        let userMsg={user : userName, pass : passWord}
-        console.log(userMsg)
-        res.render("userDash",{userMsg})
-    }
-    else{
-        if(userName == "rest1" && passWord == "4321"){
-            let restMsg={user : userName, pass : passWord}
-            console.log(restMsg)
-            res.render("restDash",{restMsg})
-        }
-        else{
-            if(userName == "admin1" && passWord == "9999"){
-                let adminMsg={user : userName, pass : passWord}
-                console.log(adminMsg)
-                res.render("adminDash",{adminMsg})
+    //let userName = req.body.username
+    //let passWord = req.body.password
+    db.collection("password").findOne({name:req.body.username}).then(doc =>{
+        console.log(doc)
+        if(req.body.password == doc.password){
+            if(doc.type == "user"){
+                res.render("userDash",{doc})
             }
             else{
-                res.send("User Name or Password Incorrect")
+                if(doc.type == "restaurent"){
+                    res.render("restDash",{doc})
+                }
+                else{
+                    if(doc.type == "admin"){
+                        res.render("adminDash",{doc})
+                    }
+                }
             }
         }
-    }
+        else{
+            res.send("password incorrect")
+        }
+    }).catch(err =>{
+        console.log("err")
+    })
+
+
+    
 })
 
+app.get("/register", (req,res)=>{
+    res.render("register")
+})
 
-app.listen(5000)
+app.post("/register", (req,res)=>{
+    console.log(req.body.username)
+    res.send(req.body)
+})

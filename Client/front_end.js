@@ -1,102 +1,125 @@
 import React, { useState } from 'react';
 
-const App = () => {
-  const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+// Example API endpoint for illustration purposes
+const API_URL = 'https://example.com/api';
+
+// Login Component
+const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [passwordValid, setPasswordValid] = useState(false);
-  const [usernameUnique, setUsernameUnique] = useState(true);
 
-  const handleRegister = () => {
-    // Check if the username is unique
-    if (!users.some((user) => user.username === username)) {
-      setUsernameUnique(true);
+  const handleLogin = async () => {
+    try {
+      // User Authentication: Make API call for authentication
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-      // Check password criteria (e.g., minimum length)
-      if (password.length >= 8) {
-        setPasswordValid(true);
-
-        // Create a new user
-        const newUser = {
-          username,
-          password,
-          mobileNumber,
-          email,
-        };
-
-        // Add the user to the list of users
-        setUsers([...users, newUser]);
+      if (response.ok) {
+        // Successful login
+        const data = await response.json();
+        onLogin(data.userType); // Pass user type to parent component
       } else {
-        setPasswordValid(false);
+        // Handle authentication error
+        console.error('Authentication failed');
       }
-    } else {
-      setUsernameUnique(false);
-    }
-  };
-
-  const handleLogin = () => {
-    // Find the user with the provided username and password
-    const user = users.find((user) => user.username === username && user.password === password);
-    if (user) {
-      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error during authentication', error);
     }
   };
 
   return (
     <div>
-      {currentUser ? (
-        <div>
-          <p>Welcome, {currentUser.username}!</p>
-        </div>
-      ) : (
-        <div>
-          <h2>Registration</h2>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Mobile Number"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button onClick={handleRegister}>Register</button>
-          {!usernameUnique && <p>Username already exists.</p>}
-          {!passwordValid && <p>Password must be at least 8 characters long.</p>}
+      <h2>Login</h2>
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={handleLogin}>Login</button>
+    </div>
+  );
+};
 
-          <h2>Login</h2>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button onClick={handleLogin}>Login</button>
-        </div>
+// Registration Component
+const Registration = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [email, setEmail] = useState('');
+
+  const handleRegistration = async () => {
+    try {
+      // User Registration: Make API call for user registration
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, mobileNumber, email }),
+      });
+
+      if (response.ok) {
+        // Successful registration
+        console.log('Registration successful');
+      } else {
+        // Handle registration error
+        console.error('Registration failed');
+      }
+    } catch (error) {
+      console.error('Error during registration', error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Registration</h2>
+      {/* User Registration: Registration form inputs */}
+      <button onClick={handleRegistration}>Register</button>
+    </div>
+  );
+};
+
+// Order Component
+const Order = () => {
+  // Implement order logic here
+
+  return (
+    <div>
+      <h2>Order</h2>
+      {/* Order Module: Order form inputs */}
+    </div>
+  );
+};
+
+// App Component
+const App = () => {
+  const [userType, setUserType] = useState('');
+
+  const handleLogin = (type) => {
+    setUserType(type);
+  };
+
+  return (
+    <div>
+      {userType ? (
+        <Order />
+      ) : (
+        <>
+          <Login onLogin={handleLogin} />
+          <Registration />
+        </>
       )}
     </div>
   );

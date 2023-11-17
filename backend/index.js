@@ -36,3 +36,12 @@ app.use('/upload', uploadController)
 
 // start our server
 app.listen(process.env.PORT, () => console.log('Server has been started successfully'))
+
+app.get("/history", (req,res) =>{
+  console.log(req.query.name)
+  db.collection("users").findOne({name:req.query.name}).then(doc =>{
+      res.render("history",{history:doc.history})
+      console.log(doc.history)
+  })
+
+})

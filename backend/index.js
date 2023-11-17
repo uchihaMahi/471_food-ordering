@@ -1,30 +1,39 @@
-const express = require("express")
+const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv').config()
-const mongoose = require('mongoose')
+const mongoose = require("mongoose")
+const authController = require('./controllers/authController')
+const productController = require('./controllers/productController')
+const uploadController = require('./controllers/uploadController')
 const app = express()
 
-//database connection
-
-mongoose.set('strictQuery', false) // This line of code turns off strict query mode for mongoose. This will allow mongoose to use non-standard query syntax.
+// connect our db
 const dbConnection = async () => {
     try {
       await mongoose.connect(process.env.MONGO_URL, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
-      });
-      console.log('Database connection is successful.');
+        authSource: 'admin', // specify the authentication database
+      })
+      console.log('Database connection is successful.')
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
-  dbConnection();
+  }
+  
+  dbConnection()
 
-// server start
+// routes & middlewares
+app.use(cors({
+    origin: 'http://localhost:3000' // Allow only this origin
+}));
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use('/images', express.static('public/images'))
+app.use('/auth', authController)
+app.use('/product', productController)
+app.use('/upload', uploadController)
 
-app.listen(process.env.PORT, () => console.log('Server has started successfully.'))
-
-
-
-
+// start our server
+app.listen(process.env.PORT, () => console.log('Server has been started successfully'))
 

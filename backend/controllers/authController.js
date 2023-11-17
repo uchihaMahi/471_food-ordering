@@ -3,7 +3,7 @@ const User = require('../models/User')
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken')
 
-
+// register
 authController.post('/register', async(req, res) => {
     try {
       const isExisting = await User.findOne({email: req.body.email})  
@@ -23,7 +23,7 @@ authController.post('/register', async(req, res) => {
     }
 })
 
-
+// login
 authController.post('/login', async(req, res) => {
     try {
        const user = await User.findOne({email: req.body.email}) 
@@ -37,7 +37,7 @@ authController.post('/login', async(req, res) => {
         throw new Error("User credentials are wrong!")
        }
 
-       const {password, ...others} = user._doc
+       const {password, ...others} = user
        const token = jwt.sign({id: user._id, isAdmin: user.isAdmin}, process.env.JWT_SECRET, {expiresIn: '5h'})
 
        return res.status(200).json({others, token})

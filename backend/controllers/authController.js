@@ -11,8 +11,9 @@ authController.post('/register', async(req, res) => {
       if(isExisting){
         throw new Error("Already such an account with this email. Try a new one!")
       }
-
-      const hashedPassword = await bcrypt.hash(req.body.password, 10)
+      
+      const salt = await bcrypt.genSalt(10)
+      let hashedPassword = await bcrypt.hash(req.body.password, salt)
 
       const newUser = await User.create({...req.body, password: hashedPassword})
       const {password, ...others} = newUser._doc
@@ -24,24 +25,6 @@ authController.post('/register', async(req, res) => {
     }
 })
 
-//delete
-authController.delete("/:id", verifyToken, async(req, res) =>{
-  const user = await User.findById(req.params.id)
-  if(!user){
-    return res.status(500)
-  }
-  if(req.user.id.toString() === user._id.toString()){
-    try{
-      await User.findByIdAndDelete(req.params.id)
-      return(res.status)
-    }catch(err){
-      return res.status(500)
-    }
-  }
-  else{
-    return res.status(403).json({msg:"You can only detete your account"})
-  }
-})
 
 
 // login

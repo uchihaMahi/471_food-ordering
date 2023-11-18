@@ -24,11 +24,10 @@ const dbConnection = async () => {
   dbConnection()
 
 // routes & middlewares
-app.use(cors({
-    origin: 'http://localhost:3000' // Allow only this origin
-}));
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(cors())
 app.use('/images', express.static('public/images'))
 app.use('/auth', authController)
 app.use('/product', productController)

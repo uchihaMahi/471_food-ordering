@@ -2,6 +2,7 @@ const authController = require('express').Router()
 const User = require('../models/User')
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken')
+const {verifyToken, verifyTokenAdmin} = require('../middlewares/verifyToken')
 
 // register
 authController.post('/register', async(req, res) => {
@@ -22,6 +23,26 @@ authController.post('/register', async(req, res) => {
         return res.status(500).json(error.message)
     }
 })
+
+//delete
+authController.delete("/:id", verifyToken, async(req, res) =>{
+  const user = await User.findById(req.params.id)
+  if(!user){
+    return res.status(500)
+  }
+  if(req.user.id.toString() === user._id.toString()){
+    try{
+      await User.findByIdAndDelete(req.params.id)
+      return(res.status)
+    }catch(err){
+      return res.status(500)
+    }
+  }
+  else{
+    return res.status(403).json({msg:"You can only detete your account"})
+  }
+})
+
 
 // login
 authController.post('/login', async(req, res) => {

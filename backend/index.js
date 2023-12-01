@@ -1,47 +1,37 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const dotenv = require('dotenv').config()
-const mongoose = require("mongoose")
-const authController = require('./controllers/authController')
-const productController = require('./controllers/productController')
-const uploadController = require('./controllers/uploadController')
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.use(cors())
+const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv").config();
+const cors = require("cors");
+const authController = require("./controllers/authController");
+const companyController = require("./controllers/companyController");
+const uploadController = require("./controllers/uploadController");
+const commentController = require("./controllers/commentController");
+const userController = require("./controllers/userController");
+const app = express();
 
-// connect our db
+mongoose.set('strictQuery', false) // This line of code turns off strict query mode for mongoose. This will allow mongoose to use non-standard query syntax.
 const dbConnection = async () => {
     try {
       await mongoose.connect(process.env.MONGO_URL, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
-        authSource: 'admin', // specify the authentication database
-      })
-      console.log('Database connection is successful.')
+      });
+      console.log('MongoDB has started successfully');
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
-  
-  dbConnection()
-
-// routes & middlewares
+  };
+  dbConnection();
+app.use('/image', express.static('public/images'))
 
 
-app.use('/images', express.static('public/images'))
-app.use('/auth', authController)
-app.use('/product', productController)
-app.use('/upload', uploadController)
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use("/auth", authController)
+app.use("/company", companyController)
+app.use("/upload", uploadController)
+app.use('/user', userController)
+app.use('/comment', commentController)
 
-// start our server
-app.listen(process.env.PORT, () => console.log('Server has been started successfully'))
-
-app.get("/history", (req,res) =>{
-  console.log(req.query.name)
-  db.collection("users").findOne({name:req.query.name}).then(doc =>{
-      res.render("history",{history:doc.history})
-      console.log(doc.history)
-  })
-
-})
+app.listen(process.env.PORT, () => console.log("Server started successfully!"));
